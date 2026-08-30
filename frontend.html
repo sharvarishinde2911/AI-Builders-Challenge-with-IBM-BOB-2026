@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>AgriSmart · डिजिटल शेती सहाय्यक</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --soil-950:#16210f;
+  --soil-900:#1c2a1e;
+  --leaf-800:#1f5f3f;
+  --leaf-700:#267a4f;
+  --leaf-600:#2f9260;
+  --leaf-100:#e2f2e6;
+  --leaf-050:#f2f8f3;
+  --clay-700:#8b5e34;
+  --clay-200:#e9d7bd;
+  --wheat-500:#e8a33d;
+  --wheat-100:#fbecd0;
+  --sky-600:#3d84a0;
+  --sky-100:#e0f0f3;
+  --alert-600:#c0392b;
+  --alert-100:#fbe1de;
+  --amber-600:#c98a12;
+  --amber-100:#fbedd2;
+  --cream-050:#faf7f0;
+  --cream-100:#f3ede0;
+  --line:#e4dcc9;
+  --ink:#1c2a1e;
+  --ink-soft:#5c6a5a;
+  --white:#ffffff;
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:24px;
+  --shadow-1:0 1px 2px rgba(28,42,30,.06),0 1px 1px rgba(28,42,30,.04);
+  --shadow-2:0 8px 24px -8px rgba(28,42,30,.18);
+  --font-display:'Poppins',sans-serif;
+  --font-body:'Noto Sans','Noto Sans Devanagari',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  background:var(--cream-050);
+  color:var(--ink);
+  min-height:100vh;
+  overscroll-behavior-y:none;
+}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:0;height:0;}
+.hidden{display:none !important;}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+
+/* ============ APP SHELL ============ */
+#app{
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--cream-050);
+  position:relative;
+  padding-bottom:86px;
+  background-image:
+    radial-gradient(circle at 100% 0%, var(--leaf-050) 0%, transparent 45%),
+    repeating-linear-gradient(115deg, rgba(31,95,63,.035) 0 2px, transparent 2px 26px);
+}
+
+.topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:rgba(250,247,240,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:9px;}
+.brand-mark{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(160deg,var(--leaf-700),var(--leaf-800));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:var(--shadow-1);
+  transform:rotate(-4deg);
+}
+.brand-name{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.02em;color:var(--soil-900);}
+.brand-tag{display:block;font-family:var(--font-body);font-weight:500;font-size:10px;color:var(--ink-soft);margin-top:-2px;}
+.top-actions{display:flex;gap:8px;}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
+  background:var(--white);display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:var(--leaf-800);
+}
+.icon-btn:active{transform:scale(.92);}
+
+/* ============ SCREENS ============ */
+.screen{display:none;padding:16px 16px 6px;animation:fadein .25s ease;}
+.screen.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.section-title{
+  font-family:var(--font-display);font-weight:700;font-size:14.5px;
+  color:var(--soil-900);margin:22px 2px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-title .link{font-family:var(--font-body);font-weight:600;font-size:12px;color:var(--leaf-700);}
+.section-title:first-child{margin-top:4px;}
+
+/* Hero / greeting */
+.hero-card{
+  background:linear-gradient(155deg,var(--leaf-800) 0%,var(--leaf-700) 55%,var(--leaf-600) 100%);
+  border-radius:var(--radius-lg);
+  padding:20px 20px 22px;
+  color:var(--white);
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow-2);
+}
+.hero-card::after{
+  content:'';position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);
+}
+.hero-greet{font-family:var(--font-display);font-weight:700;font-size:19px;}
+.hero-loc{display:flex;align-items:center;gap:5px;font-size:12px;opacity:.88;margin-top:4px;}
+.hero-stats{display:flex;gap:10px;margin-top:16px;}
+.hero-stat{
+  flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);
+  border-radius:var(--radius-sm);padding:10px 10px;
+}
+.hero-stat b{display:block;font-family:var(--font-display);font-size:18px;font-weight:800;}
+.hero-stat span{font-size:10.5px;opacity:.85;}
+
+/* generic card */
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius-md);
+  padding:14px;box-shadow:var(--shadow-1);
+}
+.card + .card{margin-top:10px;}
+
+/* Today actions - "field ticket" signature component */
+.ticket{
+  display:flex;gap:12px;background:var(--white);border:1px solid var(--line);
+  border-radius:14px;padding:12px 14px;margin-bottom:10px;position:relative;
+  border-left:5px solid var(--leaf-600);
+}
+.ticket.level-warn{border-left-color:var(--wheat-500);}
+.ticket.level-critical{border-left-color:var(--alert-600);}
+.ticket::before,.ticket::after{
+  content:'';position:absolute;left:-6px;width:12px;height:12px;border-radius:50%;
+  background:var(--cream-050);border:1px solid var(--line);
+}
+.ticket::before{top:-6px;}
+.ticket::after{bottom:-6px;}
+.ticket-icon{font-size:22px;line-height:1;padding-top:1px;}
+.ticket-body{flex:1;min-width:0;}
+.ticket-crop{font-size:10.5px;font-weight:700;color:var(--leaf-700);text-transform:uppercase;letter-spacing:.04em;}
+.ticket-action{font-family:var(--font-display);font-weight:600;font-size:13.5px;color:var(--soil-900);margin-top:2px;}
+.ticket-why{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.ticket-tag{
+  font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;
+  background:var(--leaf-100);color:var(--leaf-800);height:fit-content;
+}
+.ticket.level-warn .ticket-tag{background:var(--wheat-100);color:var(--amber-600);}
+.ticket.level-critical .ticket-tag{background:var(--alert-100);color:var(--alert-600);}
+.empty-note{text-align:center;color:var(--ink-soft);font-size:12.5px;padding:18px 8px;}
+
+/* status pill */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.pill-green{background:var(--leaf-100);color:var(--leaf-800);}
+.pill-yellow{background:var(--wheat-100);color:var(--amber-600);}
+.pill-red{background:var(--alert-100);color:var(--alert-600);}
+.pill-blue{background:var(--sky-100);color:var(--sky-600);}
+
+/* crop mini card row (home) */
+.crop-row{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;}
+.crop-chip{
+  flex:0 0 auto;width:92px;background:var(--white);border:1px solid var(--line);border-radius:16px;
+  padding:10px 8px;text-align:center;position:relative;
+}
+.crop-chip .emoji{font-size:26px;}
+.crop-chip .cname{font-size:11px;font-weight:700;margin-top:4px;color:var(--soil-900);}
+.crop-chip .cplot{font-size:9.5px;color:var(--ink-soft);}
+.crop-chip .dot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;}
+.dot-green{background:#3aa661;}
+.dot-yellow{background:var(--wheat-500);}
+.dot-red{background:var(--alert-600);}
+.crop-chip.add-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1.5px dashed var(--leaf-600);color:var(--leaf-700);font-weight:700;font-size:11px;background:var(--leaf-050);}
+.crop-chip.add-chip .plus{font-size:20px;line-height:1;}
+
+/* weather widget */
+.weather-widget{
+  border-radius:var(--radius-lg);padding:16px;color:var(--white);
+  background:linear-gradient(150deg,var(--sky-600),#2c5f78);
+  display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-2);
+}
+.weather-left .wtemp{font-family:var(--font-display);font-size:32px;font-weight:800;}
+.weather-left .wcond{font-size:12px;opacity:.9;}
+.weather-emoji{font-size:40px;}
+.weather-meta{display:flex;gap:14px;margin-top:12px;}
+.weather-meta div{font-size:11px;text-align:center;}
+.weather-meta b{display:block;font-size:13px;}
+.alert-banner{
+  display:flex;gap:10px;align-items:flex-start;background:var(--amber-100);border:1px solid #f0d9a0;
+  border-radius:var(--radius-md);padding:12px 14px;margin-top:10px;
+}
+.alert-banner .a-emoji{font-size:18px;}
+.alert-banner b{display:block;font-size:12.5px;color:#7a5507;}
+.alert-banner span{font-size:11.5px;color:#7a5507;opacity:.85;}
+
+/* market row */
+.market-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);}
+.market-row:last-child{border-bottom:none;}
+.market-row .emoji{font-size:22px;width:34px;text-align:center;}
+.market-name{font-weight:700;font-size:13px;color:var(--soil-900);}
+.market-loc{font-size:10.5px;color:var(--ink-soft);}
+.market-price{margin-left:auto;text-align:right;}
+.market-price b{font-family:var(--font-mono);font-size:13.5px;}
+.trend-up{color:#2f8f52;}
+.trend-down{color:var(--alert-600);}
+.trend-flat{color:var(--ink-soft);}
+
+/* Ask AI teaser on home */
+.ai-teaser{
+  display:flex;align-items:center;gap:12px;border-radius:var(--radius-lg);padding:14px 16px;
+  background:linear-gradient(120deg,var(--soil-900),#28381f);color:#fff;
+}
+.ai-teaser .emoji{font-size:26px;background:rgba(255,255,255,.12);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
+.ai-teaser b{font-size:13px;display:block;}
+.ai-teaser span{font-size:11px;opacity:.75;}
+
+/* buttons */
+.btn{border:none;border-radius:12px;padding:11px 16px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;justify-content:center;}
+.btn-primary{background:var(--leaf-700);color:#fff;}
+.btn-primary:active{background:var(--leaf-800);}
+.btn-outline{background:#fff;border:1.5px solid var(--leaf-700);color:var(--leaf-700);}
+.btn-soft{background:var(--leaf-050);color:var(--leaf-800);}
+.btn-block{width:100%;}
+.btn-sm{padding:7px 12px;font-size:11.5px;border-radius:9px;}
+.btn:active{transform:scale(.98);}
+
+/* ---- My Crops screen ---- */
+.plot-card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius-md);
+  padding:14px;margin-bottom:12px;box-shadow:var(--shadow-1);
+}
+.plot-head{display:flex;align-items:center;gap:10px;}
+.plot-head .emoji{font-size:30px;}
+.plot-titles b{display:block;font-family:var(--font-display);font-weight:700;font-size:14.5px;}
+.plot-titles span{font-size:11px;color:var(--ink-soft);}
+.plot-head .pill{margin-left:auto;}
+.plot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.plot-stat{background:var(--cream-100);border-radius:10px;padding:8px 10px;}
+.plot-stat span{font-size:10px;color:var(--ink-soft);display:block;}
+.plot-stat b{font-size:12.5px;}
+.plot-actions{display:flex;gap:8px;margin-top:12px;}
+.risk-strip{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+
+/* Search / category */
+.search-wrap{position:relative;margin-top:4px;}
+.search-wrap input{
+  width:100%;padding:12px 14px 12px 38px;border-radius:14px;border:1.5px solid var(--line);
+  background:var(--white);font-size:13.5px;
+}
+.search-wrap .s-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.55;}
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 4px;margin:0 -2px;}
+.cat-chip{
+  flex:0 0 auto;padding:7px 13px;border-radius:20px;background:var(--white);border:1px solid var(--line);
+  font-size:12px;font-weight:700;color:var(--ink-soft);display:flex;align-items:center;gap:5px;
+}
+.cat-chip.active{background:var(--leaf-800);color:#fff;border-color:var(--leaf-800);}
+.crop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+.crop-tile{
+  background:var(--white);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;
+}
+.crop-tile .emoji{font-size:26px;}
+.crop-tile .name{font-size:10.5px;font-weight:700;margin-top:4px;line-height:1.2;color:var(--soil-900);}
+.crop-tile:active{background:var(--leaf-050);}
+
+/* modal / sheet */
+.overlay{
+  position:fixed;inset:0;background:rgba(20,28,18,.5);z-index:100;display:none;
+  align-items:flex-end;justify-content:center;
+}
+.overlay.active{display:flex;}
+.sheet{
+  width:100%;max-width:480px;background:var(--cream-050);border-radius:24px 24px 0 0;
+  max-height:92vh;overflow-y:auto;padding:16px 16px 26px;animation:sheetup .28s ease;
+}
+@keyframes sheetup{from{transform:translateY(24px);opacity:0;}to{transform:none;opacity:1;}}
+.sheet-handle{width:40px;height:4px;background:var(--line);border-radius:4px;margin:0 auto 12px;}
+.sheet-title{font-family:var(--font-display);font-weight:800;font-size:16.5px;display:flex;justify-content:space-between;align-items:center;}
+.field{margin-top:14px;}
+.field label{font-size:11.5px;font-weight:700;color:var(--ink-soft);display:block;margin-bottom:6px;}
+.field input,.field select{
+  width:100%;padding:11px 12px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-size:13.5px;
+}
+.stage-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.stage-tabs button{flex:1 1 auto;padding:8px 6px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-size:11px;font-weight:700;color:var(--ink-soft);}
+.stage-tabs button.active{background:var(--leaf-700);border-color:var(--leaf-700);color:#fff;}
+
+/* crop detail overlay */
+.detail-hero{
+  border-radius:var(--radius-lg);padding:18px;color:#fff;text-align:center;
+  background:linear-gradient(150deg,var(--leaf-800),var(--leaf-600));
+}
+.detail-hero .emoji{font-size:44px;}
+.detail-hero b{display:block;font-family:var(--font-display);font-size:19px;margin-top:4px;}
+.detail-hero span{font-size:11.5px;opacity:.85;}
+.info-row{display:flex;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line);}
+.info-row:last-child{border-bottom:none;}
+.info-row .ic{font-size:18px;width:26px;}
+.info-row .lab{font-size:10.5px;color:var(--ink-soft);}
+.info-row .val{font-size:13px;font-weight:600;color:var(--soil-900);}
+.tag-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.tag{background:var(--cream-100);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:600;}
+.disclaimer{
+  background:var(--amber-100);border:1px solid #f0d9a0;border-radius:12px;padding:10px 12px;font-size:11px;color:#7a5507;margin-top:12px;
+}
+.timeline{margin-top:10px;}
+.tl-item{display:flex;gap:10px;padding:8px 0;}
+.tl-dot{width:9px;height:9px;border-radius:50%;background:var(--leaf-600);margin-top:5px;flex:0 0 auto;}
+.tl-item .tl-txt b{font-size:12.5px;}
+.tl-item .tl-txt span{font-size:11px;color:var(--ink-soft);display:block;}
+
+/* Diagnosis */
+.upload-box{
+  border:2px dashed var(--leaf-600);border-radius:var(--radius-lg);padding:26px 16px;text-align:center;
+  background:var(--leaf-050);
+}
+.upload-box .emoji{font-size:34px;}
+.upload-box p{font-size:12.5px;color:var(--ink-soft);margin:6px 0 14px;}
+.preview-img{width:100%;border-radius:var(--radius-md);max-height:220px;object-fit:cover;margin-top:12px;}
+.diag-result{margin-top:14px;}
+.diag-badge{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:20px;}
+.confidence-bar{height:8px;background:var(--cream-100);border-radius:6px;overflow:hidden;margin-top:8px;}
+.confidence-bar > div{height:100%;background:linear-gradient(90deg,var(--wheat-500),var(--leaf-600));}
+
+/* Satellite */
+.sat-hero{
+  border-radius:var(--radius-lg);padding:16px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#142b45,#274b63 55%,#3d84a0);
+}
+.sat-hero .orbit{position:absolute;right:-20px;top:-20px;font-size:90px;opacity:.12;}
+.sat-hero b{font-family:var(--font-display);font-size:16px;}
+.sat-hero span{font-size:11.5px;opacity:.85;}
+.ndvi-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:14px;border-radius:10px;overflow:hidden;}
+.ndvi-cell{aspect-ratio:1;border-radius:2px;}
+.legend-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.legend-chip{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);}
+.legend-sw{width:10px;height:10px;border-radius:3px;}
+.sat-metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.sat-metric{background:var(--cream-100);border-radius:12px;padding:10px 12px;}
+.sat-metric span{font-size:10px;color:var(--ink-soft);}
+.sat-metric b{display:block;font-size:15px;font-family:var(--font-display);margin-top:2px;}
+.sat-plot-select{display:flex;gap:8px;overflow-x:auto;margin-top:12px;padding-bottom:2px;}
+.sat-plot-chip{flex:0 0 auto;padding:8px 13px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:11.5px;font-weight:700;}
+.sat-plot-chip.active{background:var(--sky-600);color:#fff;border-color:var(--sky-600);}
+.source-note{font-size:10px;color:var(--ink-soft);text-align:center;margin-top:8px;font-family:var(--font-mono);}
+
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 190px);}
+.chat-log{flex:1;overflow-y:auto;padding:6px 2px;}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;font-size:13px;margin-bottom:8px;line-height:1.4;}
+.msg.bot{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;}
+.msg.user{background:var(--leaf-700);color:#fff;margin-left:auto;border-bottom-right-radius:4px;}
+.chat-suggest{display:flex;gap:6px;overflow-x:auto;padding:6px 0 10px;}
+.chat-suggest button{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:7px 12px;font-size:11.5px;font-weight:600;color:var(--leaf-800);}
+.chat-input-bar{display:flex;gap:8px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:6px 6px 6px 14px;}
+.chat-input-bar input{flex:1;border:none;outline:none;font-size:13.5px;background:transparent;}
+.mic-btn{width:38px;height:38px;border-radius:50%;background:var(--leaf-050);border:none;color:var(--leaf-800);font-size:16px;display:flex;align-items:center;justify-content:center;}
+.mic-btn.listening{background:var(--alert-600);color:#fff;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.4);}50%{box-shadow:0 0 0 10px rgba(192,57,43,0);}}
+.send-btn{width:38px;height:38px;border-radius:50%;background:var(--leaf-700);border:none;color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;}
+
+/* Bottom nav */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+  display:flex;z-index:50;padding:6px 4px calc(env(safe-area-inset-bottom,0px) + 6px);
+}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:none;background:none;color:var(--ink-soft);}
+.nav-btn .n-ic{font-size:19px;}
+.nav-btn .n-lb{font-size:9.5px;font-weight:700;}
+.nav-btn.active{color:var(--leaf-800);}
+.nav-btn.active .n-ic{transform:translateY(-2px);}
+
+/* toast */
+#toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--soil-900);color:#fff;padding:10px 18px;border-radius:30px;font-size:12.5px;
+  z-index:200;opacity:0;transition:.25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Settings screen bits */
+.lang-option{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid var(--line);}
+.lang-option:last-child{border-bottom:none;}
+.radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);position:relative;}
+.radio-dot.on{border-color:var(--leaf-700);}
+.radio-dot.on::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--leaf-700);}
+
+.skeleton{background:linear-gradient(90deg,var(--cream-100) 25%,var(--line) 37%,var(--cream-100) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:8px;}
+@keyframes sk{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🌾</div>
+      <div>
+        <div class="brand-name">AgriSmart</div>
+        <span class="brand-tag" data-t="brandTag">Your daily farm companion</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="openLangSheet()">🌐</button>
+      <button class="icon-btn" onclick="go('settings')">⚙️</button>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen active" id="screen-home">
+    <div class="hero-card">
+      <div class="hero-greet" id="homeGreet">Hello Farmer 👋</div>
+      <div class="hero-loc">📍 <span id="homeLoc" data-t="locating">Locating your farm…</span></div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b id="statCrops">0</b><span data-t="myCrops">My Crops</span></div>
+        <div class="hero-stat"><b id="statArea">0</b><span data-t="totalArea">Total Acres</span></div>
+        <div class="hero-stat"><b id="statAlerts">0</b><span data-t="activeAlerts">Active Alerts</span></div>
+      </div>
+    </div>
+
+    <div class="section-title"><span>⚡ <span data-t="todayTitle">What Should I Do Today?</span></span></div>
+    <div id="todayList"></div>
+
+    <div class="section-title"><span>🌱 <span data-t="myCrops">My Crops</span></span><span class="link" onclick="go('mycrops')" data-t="viewAll">View all</span></div>
+    <div class="crop-row" id="homeCropRow"></div>
+
+    <div class="section-title"><span>❤️ <span data-t="farmHealth">Farm Health</span></span></div>
+    <div class="card" id="farmHealthCard"></div>
+
+    <div class="section-title"><span>🌦️ <span data-t="weatherAlert">Weather Alert</span></span></div>
+    <div id="homeWeatherWidget"></div>
+
+    <div class="section-title"><span>💰 <span data-t="marketChange">Important Market Change</span></span><span class="link" onclick="go('market')" data-t="viewAll">View all</span></div>
+    <div class="card" id="homeMarketCard"></div>
+
+    <div class="section-title"><span>🛰️ <span data-t="satTitle">Satellite Field Check</span></span><span class="link" onclick="go('satellite')" data-t="viewAll">View all</span></div>
+    <div class="card" id="homeSatCard" style="cursor:pointer" onclick="go('satellite')"></div>
+
+    <div class="section-title"><span data-t="askAi">Ask Farmer AI</span></div>
+    <div class="ai-teaser" onclick="go('chat')">
+      <div class="emoji">🤖</div>
+      <div><b data-t="aiTeaserTitle">Have a farming question?</b><span data-t="aiTeaserSub">Ask in English, Hindi or Marathi</span></div>
+    </div>
+    <div style="height:6px"></div>
+  </div>
+
+  <!-- ============ MY CROPS ============ -->
+  <div class="screen" id="screen-mycrops">
+    <div class="section-title" style="margin-top:2px"><span data-t="myFarmPlots">My Farm Plots</span></div>
+    <div id="plotList"></div>
+    <button class="btn btn-primary btn-block" onclick="openAddCrop()">➕ <span data-t="addCropPlot">Add Crop / Plot</span></button>
+    <div style="height:10px"></div>
+  </div>
+
+  <!-- ============ DIAGNOSIS ============ -->
+  <div class="screen" id="screen-diagnosis">
+    <div class="section-title" style="margin-top:2px"><span>📸 <span data-t="diagTitle">Crop Diagnosis</span></span></div>
+    <div class="field">
+      <label data-t="selectCropFirst">Selected crop</label>
+      <select id="diagCropSelect" onchange="onDiagCropChange()"></select>
+    </div>
+    <div class="upload-box" id="uploadBox" style="margin-top:14px">
+      <div class="emoji">📷</div>
+      <p data-t="uploadHint">Take a photo or upload an image of the affected leaf/plant</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-primary" onclick="document.getElementById('cameraInput').click()">📸 <span data-t="takePhoto">Take Photo</span></button>
+        <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">🖼️ <span data-t="upload">Upload</span></button>
+      </div>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleImage(event)">
+      <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleImage(event)">
+    </div>
+    <img id="diagPreview" class="preview-img hidden">
+    <button class="btn btn-primary btn-block hidden" id="analyzeBtn" style="margin-top:12px" onclick="runDiagnosis()">🔬 <span data-t="analyze">Analyze Image</span></button>
+    <div id="diagResultBox" class="card diag-result hidden"></div>
+    <div class="disclaimer">⚠️ <span data-t="diagDisclaimer">This is a demo AI analysis for guidance only. Always confirm with your local Krishi Vigyan Kendra / agriculture officer before applying treatment.</span></div>
+  </div>
+
+  <!-- ============ WEATHER ============ -->
+  <div class="screen" id="screen-weather">
+    <div class="section-title" style="margin-top:2px"><span>🌦️ <span data-t="weatherTitle">Weather</span></span></div>
+    <div id="weatherMain"></div>
+    <div class="section-title"><span data-t="forecast5">5-Day Outlook</span></div>
+    <div class="card" id="forecastCard"></div>
+    <div class="section-title"><span data-t="cropAlerts">Crop-related Alerts</span></div>
+    <div id="weatherAlerts"></div>
+  </div>
+
+  <!-- ============ MARKET ============ -->
+  <div class="screen" id="screen-market">
+    <div class="section-title" style="margin-top:2px"><span>💰 <span data-t="marketTitle">Market Prices</span></span></div>
+    <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input id="marketSearch" placeholder="Search crop…" oninput="renderMarket()" data-tph="searchCropPh">
+    </div>
+    <div class="card" style="margin-top:12px;padding:6px 10px" id="marketList"></div>
+    <div class="source-note" data-t="marketNote">Demo data · structured for live mandi API integration</div>
+  </div>
+
+  <!-- ============ SATELLITE MONITORING ============ -->
+  <div class="screen" id="screen-satellite">
+    <div class="section-title" style="margin-top:2px"><span>🛰️ <span data-t="satFullTitle">Satellite Crop Monitoring</span></span></div>
+    <div class="sat-hero">
+      <div class="orbit">🛰️</div>
+      <b data-t="satHeroTitle">AI Field Analysis from Satellite Imagery</b><br>
+      <span data-t="satHeroSub">Vegetation health, drought stress & damage detection</span>
+    </div>
+    <div class="sat-plot-select" id="satPlotSelect"></div>
+    <div class="card" style="margin-top:12px" id="satSummaryCard"></div>
+    <div class="section-title"><span data-t="ndviMap">Field Vegetation Map (NDVI)</span></div>
+    <div class="card">
+      <div class="ndvi-grid" id="ndviGrid"></div>
+      <div class="legend-row">
+        <div class="legend-chip"><span class="legend-sw" style="background:#c0392b"></span><span data-t="ndviStressed">Stressed</span></div>
+        <div class="legend-chip"><span class="legend-sw" style="background:#e8a33d"></span><span data-t="ndviModerate">Moderate</span></div>
+        <div class="legend-chip"><span class="legend-sw" style="background:#7fbf5f"></span><span data-t="ndviHealthy">Healthy</span></div>
+        <div class="legend-chip"><span class="legend-sw" style="background:#1f5f3f"></span><span data-t="ndviDense">Dense / Vigorous</span></div>
+      </div>
+      <div class="source-note" id="satSourceNote">Simulated Sentinel-2 style NDVI grid · 10m resolution demo</div>
+    </div>
+    <div class="section-title"><span data-t="satMetrics">Field Indicators</span></div>
+    <div class="sat-metric-grid" id="satMetricGrid"></div>
+    <div class="section-title"><span data-t="satHistory">Health Trend (8 weeks)</span></div>
+    <div class="card">
+      <svg id="satTrendSvg" viewBox="0 0 300 90" style="width:100%;height:90px"></svg>
+    </div>
+    <div class="disclaimer">🛰️ <span data-t="satDisclaimer">Demo satellite analysis using simulated data. This module is structured to connect to real satellite sources (e.g. Sentinel-2 / Copernicus / ISRO Bhuvan) and vision models for production use.</span></div>
+  </div>
+
+  <!-- ============ FARMER AI CHAT ============ -->
+  <div class="screen" id="screen-chat">
+    <div class="section-title" style="margin-top:2px"><span>🤖 <span data-t="farmerAi">Farmer AI</span></span></div>
+    <div class="chat-wrap">
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-suggest" id="chatSuggest"></div>
+      <div class="chat-input-bar">
+        <input id="chatInput" placeholder="Type your question…" data-tph="chatPh" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="mic-btn" id="micBtn" onclick="toggleVoice()">🎙️</button>
+        <button class="send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SETTINGS ============ -->
+  <div class="screen" id="screen-settings">
+    <div class="section-title" style="margin-top:2px"><span>⚙️ <span data-t="settings">Settings</span></span></div>
+    <div class="card">
+      <div class="section-title" style="margin:0 0 6px"><span data-t="language">Language</span></div>
+      <div id="settingsLangList"></div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin:0 0 6px"><span data-t="farmProfile">Farm Profile</span></div>
+      <div class="field"><label data-t="farmerName">Farmer name</label><input id="farmerNameInput" placeholder="e.g. Ramesh Patil"></div>
+      <div class="field"><label data-t="farmLocation">Farm location</label><input id="farmLocInput" placeholder="Village, District, Maharashtra"></div>
+      <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="saveProfile()" data-t="saveProfile">Save Profile</button>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin:0 0 6px"><span data-t="dataStorage">Data</span></div>
+      <p style="font-size:11.5px;color:var(--ink-soft)" data-t="dataNote">All your farm data is stored securely on this device.</p>
+      <button class="btn btn-outline btn-block" onclick="resetApp()" data-t="resetData">Reset All Data</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<div class="bottom-nav">
+  <button class="nav-btn active" data-screen="home" onclick="go('home')"><span class="n-ic">🏠</span><span class="n-lb" data-t="navHome">Home</span></button>
+  <button class="nav-btn" data-screen="mycrops" onclick="go('mycrops')"><span class="n-ic">🌱</span><span class="n-lb" data-t="navCrops">My Crops</span></button>
+  <button class="nav-btn" data-screen="diagnosis" onclick="go('diagnosis')"><span class="n-ic">📸</span><span class="n-lb" data-t="navDiag">Diagnose</span></button>
+  <button class="nav-btn" data-screen="weather" onclick="go('weather')"><span class="n-ic">🌦️</span><span class="n-lb" data-t="navWeather">Weather</span></button>
+  <button class="nav-btn" data-screen="satellite" onclick="go('satellite')"><span class="n-ic">🛰️</span><span class="n-lb" data-t="navSat">Satellite</span></button>
+  <button class="nav-btn" data-screen="market" onclick="go('market')"><span class="n-ic">💰</span><span class="n-lb" data-t="navMarket">Market</span></button>
+  <button class="nav-btn" data-screen="chat" onclick="go('chat')"><span class="n-ic">🤖</span><span class="n-lb" data-t="navAi">Farmer AI</span></button>
+</div>
+
+<!-- ============ ADD CROP SHEET ============ -->
+<div class="overlay" id="addCropOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span data-t="selectYourCrop">Select Your Crop</span><button class="icon-btn" onclick="closeSheet('addCropOverlay')">✕</button></div>
+    <div class="search-wrap" style="margin-top:12px">
+      <span class="s-icon">🔍</span>
+      <input id="cropSearchInput" placeholder="Search crop…" oninput="renderCropGrid()" data-tph="searchCropPh">
+    </div>
+    <div class="cat-scroll" id="catScroll"></div>
+    <div class="crop-grid" id="cropGrid"></div>
+  </div>
+</div>
+
+<!-- ============ CROP CONFIG SHEET (after picking a crop) ============ -->
+<div class="overlay" id="cropConfigOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="configCropTitle">Configure Crop</span><button class="icon-btn" onclick="closeSheet('cropConfigOverlay')">✕</button></div>
+    <div class="field"><label data-t="plotName">Plot name</label><input id="cfgPlotName" placeholder="e.g. North Field"></div>
+    <div class="field"><label data-t="areaAcres">Area (acres)</label><input id="cfgArea" type="number" min="0.1" step="0.1" value="1"></div>
+    <div class="field"><label data-t="variety">Variety</label><select id="cfgVariety"></select></div>
+    <div class="field"><label data-t="sowingDate">Sowing date</label><input id="cfgSowDate" type="date"></div>
+    <div class="field">
+      <label data-t="growthStage">Growth stage</label>
+      <div class="stage-tabs" id="cfgStageTabs"></div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="saveCropConfig()" data-t="addToMyFarm">Add to My Farm</button>
+  </div>
+</div>
+
+<!-- ============ CROP DETAIL SHEET ============ -->
+<div class="overlay" id="cropDetailOverlay">
+  <div class="sheet" id="cropDetailSheet"></div>
+</div>
+
+<!-- ============ LANGUAGE SHEET ============ -->
+<div class="overlay" id="langOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span data-t="chooseLanguage">Choose Language</span><button class="icon-btn" onclick="closeSheet('langOverlay')">✕</button></div>
+    <div id="langSheetList" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ======================================================================
+   AGRISMART — SINGLE FILE APP
+   ====================================================================== */
+
+/* ---------------------- 1. TRANSLATIONS ---------------------- */
+const TRANSLATIONS = {
+en:{
+  brandTag:"Your daily farm companion", locating:"Locating your farm…",
+  myCrops:"My Crops", totalArea:"Total Acres", activeAlerts:"Active Alerts",
+  todayTitle:"What Should I Do Today?", viewAll:"View all", farmHealth:"Farm Health",
+  weatherAlert:"Weather Alert", marketChange:"Important Market Change",
+  satTitle:"Satellite Field Check", askAi:"Ask Farmer AI",
+  aiTeaserTitle:"Have a farming question?", aiTeaserSub:"Ask in English, Hindi or Marathi",
+  myFarmPlots:"My Farm Plots", addCropPlot:"Add Crop / Plot",
+  diagTitle:"Crop Diagnosis", selectCropFirst:"Selected crop", uploadHint:"Take a photo or upload an image of the affected leaf/plant",
+  takePhoto:"Take Photo", upload:"Upload", analyze:"Analyze Image",
+  diagDisclaimer:"This is a demo AI analysis for guidance only. Always confirm with your local Krishi Vigyan Kendra / agriculture officer before applying treatment.",
+  weatherTitle:"Weather", forecast5:"5-Day Outlook", cropAlerts:"Crop-related Alerts",
+  marketTitle:"Market Prices", marketNote:"Demo data · structured for live mandi API integration",
+  satFullTitle:"Satellite Crop Monitoring", satHeroTitle:"AI Field Analysis from Satellite Imagery",
+  satHeroSub:"Vegetation health, drought stress & damage detection",
+  ndviMap:"Field Vegetation Map (NDVI)", ndviStressed:"Stressed", ndviModerate:"Moderate", ndviHealthy:"Healthy", ndviDense:"Dense / Vigorous",
+  satMetrics:"Field Indicators", satHistory:"Health Trend (8 weeks)",
+  satDisclaimer:"Demo satellite analysis using simulated data. This module is structured to connect to real satellite sources (e.g. Sentinel-2 / Copernicus / ISRO Bhuvan) and vision models for production use.",
+  farmerAi:"Farmer AI", settings:"Settings", language:"Language", farmProfile:"Farm Profile",
+  farmerName:"Farmer name", farmLocation:"Farm location", saveProfile:"Save Profile",
+  dataStorage:"Data", dataNote:"All your farm data is stored securely on this device.", resetData:"Reset All Data",
+  navHome:"Home", navCrops:"My Crops", navDiag:"Diagnose", navWeather:"Weather", navSat:"Satellite", navMarket:"Market", navAi:"Farmer AI",
+  selectYourCrop:"Select Your Crop", searchCropPh:"Search crop name…",
+  plotName:"Plot name", areaAcres:"Area (acres)", variety:"Variety", sowingDate:"Sowing date",
+  growthStage:"Growth stage", addToMyFarm:"Add to My Farm", chooseLanguage:"Choose Language",
+  chatPh:"Type your question…", noCropsYet:"No crops added yet. Tap below to add your first crop.",
+  allGood:"All caught up! No urgent actions right now.", waterReq:"Water Requirement", tempReq:"Temperature",
+  soilType:"Soil Type", nutrients:"Nutrient Information", pestRisk:"Common Pest Risks", diseaseRisk:"Common Disease Risks",
+  management:"Recommended Management", harvestPeriod:"Expected Harvesting", activities:"Important Farming Activities",
+  cat_all:"All", cat_cereals:"Cereals", cat_pulses:"Pulses", cat_oilseeds:"Oilseeds", cat_cash:"Cash Crops",
+  cat_vegetables:"Vegetables", cat_fruits:"Fruits", cat_spices:"Spices", cat_plantation:"Plantation",
+  remove:"Remove", viewDetails:"View Details", waterStatus:"Water Status", cropHealth:"Crop Health",
+  weatherRisk:"Weather Risk", stage_seedling:"Seedling", stage_vegetative:"Vegetative", stage_flowering:"Flowering",
+  stage_fruiting:"Fruiting/Grain fill", stage_maturity:"Maturity", healthy:"Healthy", needsAttention:"Needs Attention", critical:"Critical",
+  droughtStress:"Drought Stress", vigor:"Vegetation Vigor (NDVI)", damageArea:"Damaged Area", moistureIdx:"Soil Moisture Index",
+  lastScan:"Last satellite scan", scanNow:"Refresh Satellite Scan", noSelPlots:"Add a crop plot first to enable satellite monitoring.",
+  addFirstCrop:"Add Your First Crop"
+},
+hi:{
+  brandTag:"आपका रोज़ का कृषि सहायक", locating:"आपका खेत ढूंढ रहे हैं…",
+  myCrops:"मेरी फसलें", totalArea:"कुल एकड़", activeAlerts:"सक्रिय चेतावनी",
+  todayTitle:"आज क्या करें?", viewAll:"सभी देखें", farmHealth:"खेत स्वास्थ्य",
+  weatherAlert:"मौसम चेतावनी", marketChange:"महत्वपूर्ण बाज़ार बदलाव",
+  satTitle:"सैटेलाइट खेत जांच", askAi:"फार्मर AI से पूछें",
+  aiTeaserTitle:"खेती से जुड़ा सवाल है?", aiTeaserSub:"अंग्रेज़ी, हिंदी या मराठी में पूछें",
+  myFarmPlots:"मेरे खेत के प्लॉट", addCropPlot:"फसल / प्लॉट जोड़ें",
+  diagTitle:"फसल जांच", selectCropFirst:"चयनित फसल", uploadHint:"प्रभावित पत्ती/पौधे की फ़ोटो लें या अपलोड करें",
+  takePhoto:"फ़ोटो लें", upload:"अपलोड करें", analyze:"विश्लेषण करें",
+  diagDisclaimer:"यह केवल मार्गदर्शन के लिए डेमो AI विश्लेषण है। उपचार से पहले अपने कृषि विज्ञान केंद्र / कृषि अधिकारी से पुष्टि करें।",
+  weatherTitle:"मौसम", forecast5:"5-दिन का पूर्वानुमान", cropAlerts:"फसल संबंधित चेतावनी",
+  marketTitle:"बाज़ार भाव", marketNote:"डेमो डेटा · लाइव मंडी API से जोड़ने हेतु तैयार",
+  satFullTitle:"सैटेलाइट फसल निगरानी", satHeroTitle:"सैटेलाइट इमेजरी से AI खेत विश्लेषण",
+  satHeroSub:"वनस्पति स्वास्थ्य, सूखा तनाव और नुकसान पहचान",
+  ndviMap:"खेत वनस्पति मानचित्र (NDVI)", ndviStressed:"तनावग्रस्त", ndviModerate:"मध्यम", ndviHealthy:"स्वस्थ", ndviDense:"घना / जोरदार",
+  satMetrics:"खेत संकेतक", satHistory:"स्वास्थ्य रुझान (8 सप्ताह)",
+  satDisclaimer:"सिम्युलेटेड डेटा का उपयोग करने वाला डेमो सैटेलाइट विश्लेषण। यह मॉड्यूल वास्तविक सैटेलाइट स्रोतों (जैसे Sentinel-2 / Copernicus / ISRO Bhuvan) और विज़न मॉडल से जोड़ने हेतु संरचित है।",
+  farmerAi:"फार्मर AI", settings:"सेटिंग्स", language:"भाषा", farmProfile:"खेत प्रोफ़ाइल",
+  farmerName:"किसान का नाम", farmLocation:"खेत का स्थान", saveProfile:"प्रोफ़ाइल सहेजें",
+  dataStorage:"डेटा", dataNote:"आपका सारा खेत डेटा इस डिवाइस पर सुरक्षित रूप से संग्रहीत है।", resetData:"सभी डेटा रीसेट करें",
+  navHome:"होम", navCrops:"फसलें", navDiag:"जांच", navWeather:"मौसम", navSat:"सैटेलाइट", navMarket:"बाज़ार", navAi:"AI",
+  selectYourCrop:"अपनी फसल चुनें", searchCropPh:"फसल का नाम खोजें…",
+  plotName:"प्लॉट का नाम", areaAcres:"क्षेत्रफल (एकड़)", variety:"किस्म", sowingDate:"बुवाई तिथि",
+  growthStage:"विकास चरण", addToMyFarm:"मेरे खेत में जोड़ें", chooseLanguage:"भाषा चुनें",
+  chatPh:"अपना सवाल लिखें…", noCropsYet:"अभी तक कोई फसल नहीं जोड़ी गई। पहली फसल जोड़ने के लिए नीचे टैप करें।",
+  allGood:"सब ठीक है! अभी कोई ज़रूरी काम नहीं।", waterReq:"पानी की आवश्यकता", tempReq:"तापमान",
+  soilType:"मिट्टी का प्रकार", nutrients:"पोषक तत्व जानकारी", pestRisk:"सामान्य कीट जोखिम", diseaseRisk:"सामान्य रोग जोखिम",
+  management:"अनुशंसित प्रबंधन", harvestPeriod:"अपेक्षित कटाई", activities:"महत्वपूर्ण खेती गतिविधियां",
+  cat_all:"सभी", cat_cereals:"अनाज", cat_pulses:"दलहन", cat_oilseeds:"तिलहन", cat_cash:"नकदी फसलें",
+  cat_vegetables:"सब्जियां", cat_fruits:"फल", cat_spices:"मसाले", cat_plantation:"बागवानी",
+  remove:"हटाएं", viewDetails:"विवरण देखें", waterStatus:"जल स्थिति", cropHealth:"फसल स्वास्थ्य",
+  weatherRisk:"मौसम जोखिम", stage_seedling:"अंकुर", stage_vegetative:"वानस्पतिक", stage_flowering:"फूल आना",
+  stage_fruiting:"फल/दाना भरना", stage_maturity:"परिपक्वता", healthy:"स्वस्थ", needsAttention:"ध्यान दें", critical:"गंभीर",
+  droughtStress:"सूखा तनाव", vigor:"वनस्पति शक्ति (NDVI)", damageArea:"क्षतिग्रस्त क्षेत्र", moistureIdx:"मिट्टी नमी सूचकांक",
+  lastScan:"अंतिम सैटेलाइट स्कैन", scanNow:"स्कैन रीफ़्रेश करें", noSelPlots:"सैटेलाइट निगरानी सक्षम करने के लिए पहले फसल जोड़ें।",
+  addFirstCrop:"पहली फसल जोड़ें"
+},
+mr:{
+  brandTag:"तुमचा रोजचा शेती सोबती", locating:"तुमचं शेत शोधत आहोत…",
+  myCrops:"माझी पिके", totalArea:"एकूण एकर", activeAlerts:"सक्रिय इशारे",
+  todayTitle:"आज काय करावं?", viewAll:"सर्व पहा", farmHealth:"शेत आरोग्य",
+  weatherAlert:"हवामान इशारा", marketChange:"महत्त्वाचा बाजार बदल",
+  satTitle:"सॅटेलाइट शेत तपासणी", askAi:"फार्मर AI ला विचारा",
+  aiTeaserTitle:"शेतीबद्दल प्रश्न आहे?", aiTeaserSub:"इंग्रजी, हिंदी किंवा मराठीत विचारा",
+  myFarmPlots:"माझे शेत प्लॉट्स", addCropPlot:"पीक / प्लॉट जोडा",
+  diagTitle:"पीक तपासणी", selectCropFirst:"निवडलेले पीक", uploadHint:"प्रभावित पान/रोपाचा फोटो घ्या किंवा अपलोड करा",
+  takePhoto:"फोटो घ्या", upload:"अपलोड करा", analyze:"विश्लेषण करा",
+  diagDisclaimer:"हे केवळ मार्गदर्शनासाठी डेमो AI विश्लेषण आहे. उपचारापूर्वी तुमच्या कृषी विज्ञान केंद्र / कृषी अधिकाऱ्याशी संपर्क साधा.",
+  weatherTitle:"हवामान", forecast5:"5-दिवसांचा अंदाज", cropAlerts:"पीक संबंधित इशारे",
+  marketTitle:"बाजारभाव", marketNote:"डेमो डेटा · लाइव्ह मंडी API शी जोडण्यासाठी तयार",
+  satFullTitle:"सॅटेलाइट पीक निरीक्षण", satHeroTitle:"सॅटेलाइट प्रतिमांवरून AI शेत विश्लेषण",
+  satHeroSub:"वनस्पती आरोग्य, दुष्काळ ताण आणि नुकसान ओळख",
+  ndviMap:"शेत वनस्पती नकाशा (NDVI)", ndviStressed:"ताणलेले", ndviModerate:"मध्यम", ndviHealthy:"निरोगी", ndviDense:"घनदाट / जोमदार",
+  satMetrics:"शेत निर्देशक", satHistory:"आरोग्य कल (8 आठवडे)",
+  satDisclaimer:"सिम्युलेटेड डेटा वापरणारे डेमो सॅटेलाइट विश्लेषण. हे मॉड्युल खऱ्या सॅटेलाइट स्रोतांशी (उदा. Sentinel-2 / Copernicus / ISRO Bhuvan) आणि व्हिजन मॉडेलशी जोडण्यासाठी तयार केले आहे.",
+  farmerAi:"फार्मर AI", settings:"सेटिंग्ज", language:"भाषा", farmProfile:"शेत प्रोफाइल",
+  farmerName:"शेतकऱ्याचे नाव", farmLocation:"शेताचे ठिकाण", saveProfile:"प्रोफाइल जतन करा",
+  dataStorage:"डेटा", dataNote:"तुमचा सर्व शेती डेटा या डिव्हाइसवर सुरक्षितपणे साठवला आहे.", resetData:"सर्व डेटा रीसेट करा",
+  navHome:"मुख्यपृष्ठ", navCrops:"पिके", navDiag:"तपासणी", navWeather:"हवामान", navSat:"सॅटेलाइट", navMarket:"बाजार", navAi:"AI",
+  selectYourCrop:"तुमचे पीक निवडा", searchCropPh:"पिकाचे नाव शोधा…",
+  plotName:"प्लॉटचे नाव", areaAcres:"क्षेत्रफळ (एकर)", variety:"जात", sowingDate:"पेरणी तारीख",
+  growthStage:"वाढीचा टप्पा", addToMyFarm:"माझ्या शेतात जोडा", chooseLanguage:"भाषा निवडा",
+  chatPh:"तुमचा प्रश्न टाइप करा…", noCropsYet:"अजून कोणतेही पीक जोडलेले नाही. पहिले पीक जोडण्यासाठी खाली टॅप करा.",
+  allGood:"सर्व काही ठीक आहे! सध्या तातडीचे काम नाही.", waterReq:"पाण्याची गरज", tempReq:"तापमान",
+  soilType:"मातीचा प्रकार", nutrients:"पोषक माहिती", pestRisk:"सामान्य कीड धोका", diseaseRisk:"सामान्य रोग धोका",
+  management:"शिफारस केलेले व्यवस्थापन", harvestPeriod:"अपेक्षित काढणी", activities:"महत्त्वाच्या शेती क्रिया",
+  cat_all:"सर्व", cat_cereals:"तृणधान्ये", cat_pulses:"कडधान्ये", cat_oilseeds:"तेलबिया", cat_cash:"नगदी पिके",
+  cat_vegetables:"भाजीपाला", cat_fruits:"फळे", cat_spices:"मसाले", cat_plantation:"बागायती",
+  remove:"काढा", viewDetails:"तपशील पहा", waterStatus:"पाणी स्थिती", cropHealth:"पीक आरोग्य",
+  weatherRisk:"हवामान धोका", stage_seedling:"रोपवाटिका", stage_vegetative:"वाढीचा टप्पा", stage_flowering:"फुलोरा",
+  stage_fruiting:"फळ/दाणे भरणे", stage_maturity:"परिपक्वता", healthy:"निरोगी", needsAttention:"लक्ष द्या", critical:"गंभीर",
+  droughtStress:"दुष्काळ ताण", vigor:"वनस्पती जोम (NDVI)", damageArea:"नुकसानग्रस्त क्षेत्र", moistureIdx:"माती ओलावा निर्देशांक",
+  lastScan:"शेवटचे सॅटेलाइट स्कॅन", scanNow:"स्कॅन रीफ्रेश करा", noSelPlots:"सॅटेलाइट निरीक्षणासाठी आधी पीक जोडा.",
+  addFirstCrop:"पहिले पीक जोडा"
+}
+};
+let currentLang = localStorage.getItem('agri_lang') || 'en';
+function t(key){ return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) || TRANSLATIONS.en[key] || key; }
+function applyTranslations(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-t]').forEach(el=>{ el.textContent = t(el.getAttribute('data-t')); });
+  document.querySelectorAll('[data-tph]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-tph')); });
+}
+
+/* ---------------------- 2. CROP DATABASE ---------------------- */
+/* fields: id, en/hi/mr name, icon, category, water(low/med/high), temp, soil,
+   nutrients, pests[], diseases[], management, harvest, varieties[], durationDays */
+function C(id,en,hi,mr,icon,cat,water,temp,soil,nutrients,pests,diseases,mgmt,harvest,varieties,duration){
+  return {id,name:{en,hi,mr},icon,cat,water,temp,soil,nutrients,pests,diseases,mgmt,harvest,varieties,duration};
+}
+const CROPS = [
+ // CEREALS
+ C('rice','Rice','धान','भात','🌾','cereals','High','20–37°C','Clay loam, water-retentive','N-P-K balanced, split nitrogen doses',['Stem borer','Brown planthopper'],['Blast','Bacterial leaf blight'],'Maintain standing water at key stages; use resistant varieties; avoid excess nitrogen','120–150 days after sowing',['IR-64','Basmati-370','Swarna'],140),
+ C('wheat','Wheat','गेहूं','गहू','🌾','cereals','Medium','10–25°C','Well-drained loam','Nitrogen at crown root stage, phosphorus at sowing',['Aphids','Termites'],['Rust (yellow/brown)','Powdery mildew'],'Timely sowing, balanced irrigation at CRI stage, resistant varieties','110–130 days after sowing',['HD-2967','Lokwan','PBW-343'],120),
+ C('maize','Maize','मक्का','मका','🌽','cereals','Medium','21–27°C','Well-drained loam','Nitrogen-heavy, split doses',['Fall armyworm','Stem borer'],['Turcicum leaf blight','Downy mildew'],'Timely weeding, monitor for armyworm early, balanced NPK','90–110 days after sowing',['Hybrid-900M','African Tall'],100),
+ C('jowar','Jowar / Sorghum','ज्वार','ज्वारी','🌾','cereals','Low','25–32°C','Medium black soil','Moderate N, responds well to FYM',['Shoot fly','Stem borer'],['Grain mould','Charcoal rot'],'Drought tolerant; avoid waterlogging; timely thinning','100–120 days after sowing',['CSH-16','Local desi'],110),
+ C('bajra','Bajra / Pearl Millet','बाजरा','बाजरी','🌾','cereals','Low','25–35°C','Sandy loam, drought tolerant','Low N requirement, responsive to FYM',['Shoot fly','Downy mildew vector pests'],['Downy mildew','Ergot'],'Very drought tolerant; light frequent irrigation only if available','75–90 days after sowing',['HHB-67','Local'],80),
+ C('ragi','Ragi / Finger Millet','रागी','नाचणी','🌾','cereals','Low','20–30°C','Red loamy, well-drained','Low input crop, light FYM helps',['Aphids','Stem borer'],['Blast disease'],'Hardy crop; ensure drainage; minimal input needed','100–120 days after sowing',['Indaf-5','Local'],110),
+ C('barley','Barley','जौ','सातू','🌾','cereals','Low','12–25°C','Loamy, tolerates light salinity','Light nitrogen, avoid excess',['Aphids'],['Yellow rust','Covered smut'],'Cool season crop; avoid waterlogging','100–120 days after sowing',['RD-2552'],110),
+ // PULSES
+ C('tur','Tur / Pigeon Pea','अरहर','तूर','🫘','pulses','Low','20–30°C','Well-drained black/loam soil','Fixes own nitrogen; needs phosphorus & sulfur',['Pod borer','Aphids'],['Wilt','Sterility mosaic'],'Intercrop with cereals; monitor pod borer at flowering','150–180 days after sowing',['BDN-711','ICPL-87'],170),
+ C('gram','Gram / Chickpea','चना','हरभरा','🫘','pulses','Low','15–25°C','Well-drained loam','Phosphorus & sulfur important',['Pod borer (Helicoverpa)'],['Wilt','Blight'],'Avoid waterlogging; timely pod borer scouting','90–110 days after sowing',['JG-11','Vijay'],100),
+ C('moong','Moong / Green Gram','मूंग','मूग','🫘','pulses','Low','25–35°C','Well-drained sandy loam','Light phosphorus dose',['Whitefly','Aphids'],['Yellow mosaic virus'],'Short duration crop; timely weeding; whitefly monitoring for YMV','60–70 days after sowing',['Vaibhav','K-851'],65),
+ C('urad','Urad / Black Gram','उड़द','उडीद','🫘','pulses','Low','25–35°C','Loam to clay loam','Light phosphorus dose',['Whitefly','Pod borer'],['Yellow mosaic virus','Leaf spot'],'Avoid waterlogging; manage whitefly for virus control','65–75 days after sowing',['TAU-1','PDU-1'],70),
+ C('masoor','Masoor / Lentil','मसूर','मसूर','🫘','pulses','Low','15–25°C','Loamy, well-drained','Light phosphorus, sulfur helps',['Aphids','Pod borer'],['Rust','Wilt'],'Cool season crop; avoid excess irrigation','100–120 days after sowing',['Local','L-4147'],110),
+ C('cowpea','Cowpea / Chawli','लोबिया','चवळी','🫛','pulses','Low','25–35°C','Sandy loam','Light nitrogen at start, fixes own N later',['Aphids','Pod borer'],['Mosaic virus'],'Fast growing; regular picking of pods for vegetable use','60–90 days after sowing',['Pusa Komal'],70),
+ C('peas','Peas','मटर','वाटाणा','🫛','pulses','Medium','10–20°C','Loamy, well-drained','Phosphorus & potash important',['Aphids','Pod borer'],['Powdery mildew'],'Cool season; stake tall varieties; timely irrigation at flowering','70–90 days after sowing',['Arkel','Bonneville'],80),
+ // OILSEEDS
+ C('soybean','Soybean','सोयाबीन','सोयाबीन','🌱','oilseeds','Medium','20–30°C','Well-drained black soil','Fixes own nitrogen; needs phosphorus & sulfur',['Stem fly','Girdle beetle','Pod borer'],['Yellow mosaic virus','Rust'],'Ensure good drainage; monitor for pod borer at pod stage; avoid waterlogging','95–110 days after sowing',['JS-335','MAUS-71'],100),
+ C('groundnut','Groundnut / Peanut','मूंगफली','भुईमूग','🥜','oilseeds','Medium','25–30°C','Sandy loam','Calcium (gypsum) at pegging important',['Leaf miner','Termites'],['Tikka leaf spot','Rust'],'Gypsum application at flowering; earthing up before pegging','100–130 days after sowing',['TAG-24','SB-11'],110),
+ C('sunflower','Sunflower','सूरजमुखी','सूर्यफूल','🌻','oilseeds','Medium','20–30°C','Well-drained loam','Boron important at flowering',['Head borer'],['Alternaria blight'],'Assist pollination if bee activity low; boron spray at bud stage','90–110 days after sowing',['Modern','KBSH-1'],100),
+ C('mustard','Mustard','सरसों','मोहरी','🌼','oilseeds','Low','10–25°C','Loamy, well-drained','Sulfur critical for oil content',['Aphids','Painted bug'],['White rust','Alternaria blight'],'Sulfur fertilization boosts yield & oil %; monitor aphids at flowering','100–120 days after sowing',['Pusa Bold','Varuna'],110),
+ C('sesame','Sesame / Til','तिल','तीळ','🌱','oilseeds','Low','25–35°C','Well-drained sandy loam','Light nitrogen and phosphorus',['Leaf webber','Gall fly'],['Phyllody','Leaf spot'],'Avoid waterlogging strictly; timely thinning of seedlings','80–100 days after sowing',['TKG-22'],90),
+ C('safflower','Safflower','कुसुम','करडई','🌼','oilseeds','Low','15–25°C','Medium to deep black soil','Low water need; light phosphorus',['Aphids'],['Wilt','Alternaria blight'],'Very drought tolerant; wide spacing to reduce aphid buildup','110–130 days after sowing',['Bhima','A-1'],120),
+ C('castor','Castor','अरंडी','एरंडी','🌱','oilseeds','Low','20–30°C','Well-drained loam','Moderate nitrogen in splits',['Semilooper','Capsule borer'],['Wilt','Grey mould'],'Wide spacing; monitor capsule borer near maturity','150–180 days after sowing',['GCH-7'],170),
+ C('linseed','Linseed / Flaxseed','अलसी','जवस','🌱','oilseeds','Low','10–25°C','Loamy soil','Light phosphorus and potash',['Aphids','Gall fly'],['Rust','Wilt'],'Cool season crop; avoid waterlogging','110–130 days after sowing',['Local'],120),
+ // CASH CROPS
+ C('sugarcane','Sugarcane','गन्ना','ऊस','🎋','cash','High','20–35°C','Deep, well-drained loam','Heavy N-P-K feeder, split nitrogen doses',['Early shoot borer','Whitefly'],['Red rot','Smut'],'Regular earthing up; trash mulching to conserve moisture; timely irrigation','10–12 months after planting',['Co-86032','CoM-0265'],330),
+ C('cotton','Cotton','कपास','कापूस','☁️','cash','Medium','21–30°C','Deep black cotton soil','Balanced NPK, boron helps boll development',['Pink bollworm','Whitefly','Aphids'],['Leaf curl virus','Wilt'],'Monitor pink bollworm with pheromone traps; avoid excess nitrogen late season','150–180 days after sowing',['Bt Hybrid','DCH-32'],170),
+ C('tobacco','Tobacco','तंबाकू','तंबाखू','🍃','cash','Medium','20–30°C','Well-drained sandy loam','Potash-heavy for leaf quality',['Aphids','Caterpillars'],['Leaf spot','Mosaic virus'],'Topping and suckering at right stage improves leaf quality','90–120 days after transplanting',['Local'],100),
+ C('jute','Jute','जूट','ताग','🌿','cash','High','24–37°C','Alluvial, moisture retentive','Nitrogen important for fibre yield',['Stem weevil','Semilooper'],['Stem rot'],'Requires standing water tolerance during retting; timely harvest for fibre quality','100–120 days after sowing',['JRO-524'],110),
+ // VEGETABLES
+ C('onion','Onion','प्याज़','कांदा','🧅','vegetables','Medium','15–25°C','Well-drained loam','Sulfur improves pungency & storage',['Thrips'],['Purple blotch','Downy mildew'],'Avoid overwatering near maturity; stop irrigation before harvest for good storage','110–150 days after transplanting',['N-53','Bhima Super'],130),
+ C('potato','Potato','आलू','बटाटा','🥔','vegetables','Medium','15–20°C','Well-drained sandy loam','Potash important for tuber quality',['Aphids','Cutworm'],['Late blight','Early blight'],'Earthing up at tuber initiation; monitor humid weather for late blight','90–110 days after planting',['Kufri Jyoti','Kufri Pukhraj'],100),
+ C('tomato','Tomato','टमाटर','टोमॅटो','🍅','vegetables','Medium','20–27°C','Well-drained loam','Calcium prevents blossom end rot',['Fruit borer','Whitefly'],['Early blight','Leaf curl virus'],'Staking improves airflow; monitor fruit borer weekly; avoid overhead watering','75–90 days after transplanting',['Pusa Ruby','Abhinav'],85),
+ C('brinjal','Brinjal / Eggplant','बैंगन','वांगी','🍆','vegetables','Medium','21–30°C','Well-drained loam','Balanced NPK, boron for fruit set',['Fruit & shoot borer'],['Bacterial wilt'],'Prune infested shoots; use pheromone traps for shoot borer','80–100 days after transplanting',['Pusa Purple Long'],90),
+ C('cabbage','Cabbage','पत्तागोभी','कोबी','🥬','vegetables','Medium','15–20°C','Rich loam, well-drained','Nitrogen for leafy growth',['Diamondback moth','Aphids'],['Black rot'],'Rotate crops; monitor diamondback moth closely','70–100 days after transplanting',['Golden Acre'],85),
+ C('cauliflower','Cauliflower','फूलगोभी','फ्लॉवर','🥦','vegetables','Medium','15–22°C','Rich loam','Boron & molybdenum for curd quality',['Aphids','Diamondback moth'],['Black rot','Curd blight'],'Blanch curds from sun; consistent moisture for quality','70–100 days after transplanting',['Snowball-16'],85),
+ C('okra','Lady Finger / Okra','भिंडी','भेंडी','🌿','vegetables','Medium','24–30°C','Well-drained loam','Balanced NPK',['Shoot & fruit borer','Jassids'],['Yellow vein mosaic virus'],'Regular picking prevents fibre; remove virus-infected plants early','50–65 days after sowing',['Pusa Sawani'],55),
+ C('chilli','Chilli','मिर्च','मिरची','🌶️','vegetables','Medium','20–30°C','Well-drained loam','Calcium & potash for fruit quality',['Thrips','Fruit borer'],['Leaf curl virus','Anthracnose'],'Monitor thrips which spread leaf curl; avoid water stress at flowering','120–150 days after transplanting',['G-4','Byadgi'],135),
+ C('capsicum','Capsicum','शिमला मिर्च','सिमला मिरची','🫑','vegetables','Medium','18–25°C','Well-drained loam','Calcium important for fruit quality',['Aphids','Thrips'],['Powdery mildew'],'Staking recommended; consistent watering avoids blossom end rot','70–90 days after transplanting',['California Wonder'],80),
+ C('carrot','Carrot','गाजर','गाजर','🥕','vegetables','Medium','15–22°C','Deep sandy loam','Potash for root quality',['Aphids'],['Leaf blight'],'Thin seedlings early for straight roots; loose deep soil needed','90–110 days after sowing',['Nantes','Pusa Kesar'],100),
+ C('radish','Radish','मूली','मुळा','🥕','vegetables','Medium','10–25°C','Loose sandy loam','Light nitrogen and potash',['Aphids'],['Club root'],'Fast crop; thin early; avoid stony/compact soil','35–50 days after sowing',['Pusa Chetki'],40),
+ C('spinach','Spinach','पालक','पालक','🥬','vegetables','Medium','15–25°C','Rich loam','Nitrogen for leaf growth',['Leaf miner','Aphids'],['Downy mildew'],'Multiple cuttings possible; keep soil consistently moist','40–50 days after sowing',['All Green'],45),
+ C('cucumber','Cucumber','खीरा','काकडी','🥒','vegetables','Medium','24–30°C','Well-drained sandy loam','Balanced NPK, boron for fruiting',['Fruit fly','Red pumpkin beetle'],['Powdery mildew','Downy mildew'],'Trellising improves fruit quality; monitor for fruit fly','50–65 days after sowing',['Poinsette'],60),
+ C('pumpkin','Pumpkin','कद्दू','भोपळा','🎃','vegetables','Medium','24–30°C','Well-drained loam','Balanced NPK',['Red pumpkin beetle','Fruit fly'],['Powdery mildew'],'Hand pollination boosts fruit set; wide spacing needed','90–120 days after sowing',['Local'],100),
+ C('bottlegourd','Bottle Gourd','लौकी','दुधी भोपळा','🥒','vegetables','Medium','24–30°C','Well-drained loam','Balanced NPK',['Fruit fly','Red pumpkin beetle'],['Powdery mildew'],'Trellising recommended; regular harvest of tender fruit','60–80 days after sowing',['Pusa Naveen'],70),
+ C('bittergourd','Bitter Gourd','करेला','कारले','🥒','vegetables','Medium','24–30°C','Well-drained loam','Balanced NPK, boron helps',['Fruit fly','Red pumpkin beetle'],['Powdery mildew','Downy mildew'],'Trellising recommended; bag fruits to prevent fruit fly','55–70 days after sowing',['Coimbatore Long'],65),
+ C('ridgegourd','Ridge Gourd','तोरई','दोडका','🥒','vegetables','Medium','24–32°C','Well-drained loam','Balanced NPK',['Fruit fly'],['Powdery mildew'],'Trellising improves shape and quality of fruit','55–70 days after sowing',['Local'],65),
+ // FRUITS
+ C('mango','Mango','आम','आंबा','🥭','fruits','Medium','24–30°C','Deep well-drained loam','Balanced NPK, micronutrient sprays at flowering',['Mango hopper','Fruit fly'],['Anthracnose','Powdery mildew'],'Prune after harvest; avoid irrigation during flowering to reduce disease','3–5 months after flowering',['Alphonso','Kesar'],120),
+ C('banana','Banana','केला','केळी','🍌','fruits','High','20–30°C','Rich loam, high organic matter','Heavy potash feeder',['Rhizome weevil','Aphids'],['Panama wilt','Sigatoka leaf spot'],'Propping to prevent lodging; consistent irrigation critical','11–13 months after planting',['Grand Naine','Robusta'],360),
+ C('grapes','Grapes','अंगूर','द्राक्ष','🍇','fruits','Medium','15–35°C','Well-drained loam','Balanced NPK with micronutrients',['Thrips','Mealybug'],['Downy mildew','Powdery mildew'],'Canopy management for airflow; timely fungicide-free monitoring after rain','120–150 days after pruning',['Thompson Seedless'],135),
+ C('orange','Orange','संतरा','संत्रा','🍊','fruits','Medium','13–30°C','Well-drained loam','Balanced NPK, micronutrients for citrus',['Citrus psylla','Leaf miner'],['Citrus canker','Gummosis'],'Avoid waterlogging around root zone; monitor psylla for greening disease','8–11 months after flowering',['Nagpur Mandarin'],270),
+ C('pomegranate','Pomegranate','अनार','डाळिंब','🍎','fruits','Low','20–35°C','Well-drained loam, tolerant of light salinity','Balanced NPK, boron for fruit set',['Fruit borer','Aphids'],['Bacterial blight','Wilt'],'Bahar (flowering cycle) management is key; regular fruit borer monitoring','5–7 months after flowering',['Bhagwa','Ganesh'],180),
+ C('guava','Guava','अमरूद','पेरू','🍈','fruits','Medium','15–33°C','Wide soil adaptability','Balanced NPK, zinc helps',['Fruit fly'],['Wilt','Anthracnose'],'Bagging fruit reduces fruit fly damage; prune for airflow','4–5 months after flowering',['Lucknow-49','Allahabad Safeda'],130),
+ C('papaya','Papaya','पपीता','पपई','🌴','fruits','Medium','22–32°C','Well-drained rich loam','Heavy feeder, regular NPK',['Aphids','Mealybug'],['Ring spot virus','Powdery mildew'],'Ensure good drainage — very sensitive to waterlogging; control aphids to limit virus','9–11 months after planting',['Red Lady','Taiwan-786'],300),
+ C('watermelon','Watermelon','तरबूज','कलिंगड','🍉','fruits','Medium','24–32°C','Sandy loam, well-drained','Potash improves sweetness',['Fruit fly','Aphids'],['Powdery mildew','Fusarium wilt'],'Mulching conserves moisture; avoid water stress during fruit development','80–100 days after sowing',['Sugar Baby'],90),
+ C('muskmelon','Muskmelon','खरबूजा','खरबूज','🍈','fruits','Medium','24–32°C','Sandy loam','Potash for sweetness',['Fruit fly','Aphids'],['Powdery mildew'],'Mulching helps; consistent moisture during fruit swell','80–100 days after sowing',['Punjab Sunehri'],90),
+ C('apple','Apple','सेब','सफरचंद','🍏','fruits','Medium','4–24°C (needs chilling)','Well-drained loam, cooler climates','Balanced NPK per soil test',['Woolly aphid','San Jose scale'],['Scab','Powdery mildew'],'Needs winter chilling hours; thinning improves fruit size','5–6 months after flowering',['Royal Delicious'],150),
+ C('custardapple','Custard Apple','शरीफा','सीताफळ','🍏','fruits','Low','20–35°C','Well-drained, tolerates poor soil','Light balanced NPK',['Mealybug','Fruit borer'],['Anthracnose'],'Hardy, drought tolerant; hand pollination can boost yield','4–5 months after flowering',['Balanagar'],130),
+ C('sapota','Sapota / Chikoo','चीकू','चिकू','🟤','fruits','Medium','20–33°C','Deep well-drained loam','Balanced NPK, micronutrients',['Bark borer','Leaf webber'],['Leaf spot'],'Prune for airflow; deep watering during fruit development','7–8 months after flowering',['Kalipatti'],220),
+ C('strawberry','Strawberry','स्ट्रॉबेरी','स्ट्रॉबेरी','🍓','fruits','Medium','15–25°C','Rich well-drained loam','Balanced NPK, calcium for fruit firmness',['Aphids','Mites'],['Grey mould (Botrytis)','Powdery mildew'],'Mulching keeps fruit clean and reduces rot; drip irrigation preferred','60–75 days after planting',['Camarosa'],70),
+ C('lemon','Lemon','नींबू','लिंबू','🍋','fruits','Medium','13–33°C','Well-drained loam','Balanced NPK, micronutrients for citrus',['Citrus psylla','Leaf miner'],['Citrus canker'],'Avoid waterlogging; regular light irrigation better than heavy infrequent','7–9 months after flowering',['Kagzi Lime'],240),
+ // SPICES
+ C('turmeric','Turmeric','हल्दी','हळद','🟡','spices','High','20–30°C','Well-drained rich loam','Heavy potash feeder for rhizome',['Rhizome fly','Shoot borer'],['Rhizome rot','Leaf spot'],'Ensure good drainage to prevent rhizome rot; mulching conserves moisture','8–9 months after planting',['Salem','Rajapuri'],260),
+ C('ginger','Ginger','अदरक','आले','🫚','spices','High','20–30°C','Rich well-drained loam','Heavy potash and organic matter',['Shoot borer','Rhizome scale'],['Rhizome rot','Bacterial wilt'],'Raised beds prevent waterlogging; mulch heavily','8 months after planting',['Local Maran'],240),
+ C('garlic','Garlic','लहसुन','लसूण','🧄','spices','Low','12–25°C','Well-drained loam','Sulfur improves bulb pungency',['Thrips'],['Purple blotch'],'Stop irrigation before harvest for good storage life','130–150 days after sowing',['Yamuna Safed'],140),
+ C('coriander','Coriander','धनिया','धणे','🌿','spices','Low','15–27°C','Well-drained loam','Light balanced NPK',['Aphids'],['Powdery mildew','Wilt'],'Light frequent irrigation; harvest leaves before bolting','40–45 days (leaves) / 90 (seed)',['Local'],45),
+ C('cumin','Cumin','जीरा','जिरे','🌿','spices','Low','15–25°C','Well-drained loam','Light phosphorus and potash',['Aphids'],['Wilt','Blight'],'Avoid excess irrigation — sensitive to wilt in wet soil','100–120 days after sowing',['GC-4'],110),
+ C('fennel','Fennel','सौंफ','बडीशेप','🌿','spices','Medium','15–25°C','Well-drained loam','Balanced NPK',['Aphids'],['Powdery mildew'],'Support tall stems in windy areas; consistent moisture at seed set','130–160 days after sowing',['Local'],150),
+ C('blackpepper','Black Pepper','काली मिर्च','काळी मिरी','⚫','spices','High','20–32°C','Rich well-drained loam','Balanced NPK, needs support tree/pole',['Pollu beetle'],['Foot rot (Phytophthora)'],'Ensure good drainage — foot rot is major risk; use support trees','8–9 months after flowering',['Panniyur-1'],260),
+ // PLANTATION
+ C('coconut','Coconut','नारियल','नारळ','🥥','plantation','High','20–32°C','Sandy loam, coastal soils','Potash and chlorine important',['Rhinoceros beetle','Red palm weevil'],['Bud rot','Root wilt'],'Basin irrigation regularly; remove beetle breeding sites nearby','12 months (year-round bearing)',['West Coast Tall'],365),
+ C('cashew','Cashew','काजू','काजू','🌰','plantation','Low','20–35°C','Well-drained lateritic soil','Light balanced NPK',['Tea mosquito bug','Stem borer'],[
