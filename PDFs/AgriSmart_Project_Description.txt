@@ -1,0 +1,41 @@
+AGRISMART
+
+AI-Powered Satellite-Based Crop Monitoring Platform
+
+AgriSmart is an AI-powered, satellite-based platform that helps farmers monitor their crops and detect problems early.
+
+Farmers commonly face problems like crop diseases, pests, drought, water stress, and unpredictable weather. Often, these problems are detected only after the crop is already damaged.
+
+AgriSmart helps solve this problem through early monitoring and alerts.
+
+MAIN FEATURES:
+
+1. Satellite Crop Monitoring
+Monitors field conditions using satellite imagery and indicators like NDVI.
+
+2. Crop Health Detection
+Shows crop status as Healthy, Attention, or Critical.
+
+3. Water Stress and Drought Detection
+Identifies possible water-related stress and drought conditions.
+
+4. Weather Alerts
+Provides crop-aware alerts based on weather conditions.
+
+5. Crop Diagnosis
+Allows farmers to upload a crop image to identify possible problems.
+
+6. Market Information
+Provides market prices and trends to support better selling decisions.
+
+SIMPLICITY AND ACCESSIBILITY:
+
+AgriSmart focuses on simplicity and accessibility. It provides a mobile-friendly interface with Marathi and Hindi language support.
+
+GOAL:
+
+The goal of AgriSmart is simple: help farmers detect problems early, understand what is happening, and take action at the right time.
+
+AgriSmart — Monitor smarter, act earlier, grow better.
+
+Thank you.

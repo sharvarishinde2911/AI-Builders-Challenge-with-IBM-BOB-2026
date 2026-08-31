@@ -1,0 +1,479 @@
+AGRISMART
+AI APPROACH AND SYSTEM ARCHITECTURE
+
+1. PROJECT OVERVIEW
+
+AgriSmart is an AI-powered, satellite-based crop monitoring platform designed to help farmers detect crop problems early.
+
+The system combines satellite imagery, weather information, crop images, AI analysis, and market information to provide simple and useful recommendations to farmers.
+
+Main objective:
+Monitor crops -> Detect problems early -> Alert the farmer -> Suggest appropriate action.
+
+2. AI APPROACH
+
+AgriSmart can use a combination of AI, computer vision, satellite-data analysis, and rule-based decision logic.
+
+A. SATELLITE CROP MONITORING
+
+Satellite imagery can be used to monitor the condition of agricultural fields.
+
+The system can use Sentinel-2 or similar satellite data when connected to a real satellite-data provider.
+
+Important vegetation indicators include:
+
+- NDVI (Normalized Difference Vegetation Index)
+- NDWI (Normalized Difference Water Index)
+- Other vegetation and moisture indicators when required
+
+NDVI can be calculated using:
+
+NDVI = (NIR - Red) / (NIR + Red)
+
+Higher NDVI generally indicates healthier and more actively growing vegetation, while lower values can indicate crop stress, bare soil, or damaged vegetation.
+
+AI Approach:
+1. Collect satellite images for the selected field.
+2. Preprocess the satellite data.
+3. Calculate vegetation and moisture indicators.
+4. Compare current values with previous observations.
+5. Detect unusual changes.
+6. Classify the field as Healthy, Attention, or Critical.
+7. Send an alert when significant stress is detected.
+
+B. CROP HEALTH DETECTION
+
+The crop health module converts satellite indicators and other available information into an easy-to-understand status.
+
+Example:
+
+Healthy:
+Normal vegetation condition and stable indicators.
+
+Attention:
+Possible early stress or abnormal change.
+
+Critical:
+Strong or continuous stress requiring immediate attention.
+
+For a prototype, threshold-based classification can be used. Later, a machine-learning model can be trained using historical crop and satellite data.
+
+C. WATER STRESS AND DROUGHT DETECTION
+
+Water stress can be estimated by combining:
+
+- NDVI
+- NDWI
+- Rainfall
+- Temperature
+- Humidity
+- Historical field observations
+
+AI can compare current conditions with normal conditions for the crop and location.
+
+If vegetation health decreases while moisture and rainfall indicators are also low, the system can generate a possible water-stress alert.
+
+D. WEATHER-BASED AI ALERTS
+
+The platform can obtain weather information such as:
+
+- Temperature
+- Rainfall
+- Humidity
+- Wind
+- Weather warnings
+
+A decision engine can combine weather data with crop information.
+
+Example:
+If heavy rainfall is predicted and the crop is sensitive to excess moisture, the system can display a crop-aware warning.
+
+E. CROP IMAGE DIAGNOSIS
+
+Farmers can upload a photo of a crop or leaf.
+
+The image-analysis pipeline can be:
+
+Farmer Image
+    |
+Image Preprocessing
+    |
+AI/Computer Vision Model
+    |
+Possible Disease / Pest / Stress
+    |
+Confidence Score
+    |
+Recommended Next Step
+
+A CNN or modern vision model can be used for crop disease classification.
+
+For the initial prototype, a pretrained image-classification model can be used. Later, it can be fine-tuned using region-specific crop disease datasets.
+
+The result should be presented as a possible diagnosis rather than a guaranteed diagnosis.
+
+F. MARKET INFORMATION
+
+Market data can be collected from an appropriate agricultural market-data source.
+
+AI can help summarize:
+
+- Current price
+- Recent price trend
+- Price comparison between markets
+- Simple selling-related insights
+
+The system should clearly distinguish factual market data from AI-generated interpretation.
+
+3. RECOMMENDED AI PIPELINE
+
+The overall AI pipeline is:
+
+DATA COLLECTION
+    |
+    +--> Satellite Data
+    +--> Weather Data
+    +--> Crop Image
+    +--> Crop / Field Information
+    +--> Market Data
+    |
+DATA PREPROCESSING
+    |
+FEATURE EXTRACTION
+    |
+AI / ML ANALYSIS
+    |
+DECISION ENGINE
+    |
+ALERT + RECOMMENDATION
+    |
+FARMER DASHBOARD
+
+4. SYSTEM ARCHITECTURE
+
+Recommended architecture:
+
+                    AGRISMART
+                        |
+                 FRONTEND / UI
+                        |
+              React / Mobile-Friendly UI
+                        |
+                     REST API
+                        |
+                 FASTAPI BACKEND
+                        |
+        +---------------+----------------+
+        |               |                |
+   AI/ML MODULE    DATA SERVICES    DECISION ENGINE
+        |               |                |
+        |        +------+-------+        |
+        |        |              |        |
+ Satellite AI  Weather API   Market API  |
+        |        |              |        |
+        +--------+--------------+--------+
+                        |
+                    DATABASE
+                     MongoDB
+                        |
+                  FARMER / FIELD DATA
+
+5. FRONTEND LAYER
+
+The frontend provides a simple mobile-friendly interface for farmers.
+
+Suggested technologies:
+
+- React
+- HTML/CSS/JavaScript
+- Responsive design
+- Marathi and Hindi language support
+
+Main screens can include:
+
+- Dashboard
+- Field Selection
+- Satellite Monitoring
+- Crop Health
+- Water Stress
+- Weather Alerts
+- Crop Diagnosis
+- Market Information
+- Recommendations
+
+6. BACKEND LAYER
+
+FastAPI can be used as the backend API layer.
+
+The backend manages:
+
+- User information
+- Farmer and field information
+- Satellite-data requests
+- Weather-data requests
+- AI model requests
+- Crop diagnosis requests
+- Alerts
+- Recommendations
+- Market information
+
+Example API endpoints:
+
+POST /api/crop-diagnosis
+GET /api/fields
+GET /api/fields/{field_id}/health
+GET /api/fields/{field_id}/satellite
+GET /api/fields/{field_id}/water-stress
+GET /api/weather-alerts
+GET /api/market-prices
+
+7. DATABASE ARCHITECTURE
+
+MongoDB can be used for application data.
+
+Suggested collections:
+
+users
+- user_id
+- name
+- language
+- location
+
+fields
+- field_id
+- user_id
+- crop_name
+- location
+- area
+- planting_date
+
+crop_health
+- field_id
+- date
+- ndvi
+- ndwi
+- health_status
+- stress_level
+
+weather
+- location
+- date
+- temperature
+- rainfall
+- humidity
+- alerts
+
+diagnosis
+- user_id
+- image_reference
+- detected_problem
+- confidence
+- recommendation
+- date
+
+market_prices
+- crop
+- market
+- price
+- date
+
+alerts
+- user_id
+- field_id
+- alert_type
+- severity
+- message
+- date
+
+8. AI DECISION ENGINE
+
+The decision engine combines information from different modules.
+
+Example:
+
+Satellite Data
+       +
+Weather Data
+       +
+Crop Information
+       +
+Historical Data
+       |
+       v
+AI / Rule-Based Decision Engine
+       |
+       v
+Risk Score
+       |
+       +--> Healthy
+       +--> Attention
+       +--> Critical
+       |
+       v
+Farmer Alert
+       |
+       v
+Recommended Action
+
+For a hackathon prototype, a hybrid approach is recommended:
+
+- Use real APIs where available.
+- Use simulated satellite data if live satellite integration is not available.
+- Use simple thresholds for NDVI/NDWI-based demonstrations.
+- Use a pretrained or demo computer-vision model for crop images.
+- Use a rule-based recommendation engine for transparent alerts.
+- Add an AI/LLM layer for explaining results in simple language.
+
+9. AI EXPLANATION LAYER
+
+An AI language model can convert technical analysis into simple farmer-friendly language.
+
+Example:
+
+Technical result:
+NDVI decreased significantly over the last observation period.
+
+Farmer-friendly result:
+"Your crop may be experiencing stress. Check soil moisture and irrigation conditions."
+
+The explanation can be generated in:
+
+- English
+- Marathi
+- Hindi
+
+The AI explanation should use the actual detected data as input instead of inventing measurements.
+
+10. END-TO-END WORKFLOW
+
+Step 1:
+Farmer selects or registers a field.
+
+Step 2:
+The system stores the field location and crop information.
+
+Step 3:
+Satellite and weather data are collected for the field.
+
+Step 4:
+The system calculates crop-health and moisture indicators.
+
+Step 5:
+AI/rule-based analysis identifies possible crop stress.
+
+Step 6:
+The decision engine assigns a status:
+Healthy, Attention, or Critical.
+
+Step 7:
+Weather conditions are checked for crop-specific risks.
+
+Step 8:
+If the farmer uploads a crop image, the computer-vision module analyzes it.
+
+Step 9:
+The system combines the results and generates an easy-to-understand alert.
+
+Step 10:
+The farmer receives a recommended next action.
+
+11. HACKATHON-FRIENDLY IMPLEMENTATION
+
+For a working prototype, the architecture can be simplified to:
+
+Frontend:
+React
+
+Backend:
+FastAPI + Python
+
+Database:
+MongoDB
+
+AI:
+Python ML/Computer Vision + optional LLM
+
+Satellite:
+Simulated data initially, with a design ready for Sentinel-2/Copernicus integration
+
+Weather:
+Weather API
+
+Market:
+Agricultural market-price API or structured sample data
+
+Deployment:
+Frontend and backend can be deployed separately and connected through REST APIs.
+
+12. FUTURE AI IMPROVEMENTS
+
+Future versions of AgriSmart can include:
+
+- Field-specific AI models
+- Crop disease detection with larger datasets
+- Time-series satellite analysis
+- Automatic crop-type identification
+- Yield prediction
+- Pest-risk prediction
+- Irrigation recommendations
+- Fertilizer recommendations
+- Regional drought forecasting
+- Personalized recommendations based on previous field data
+- Voice-based farmer assistance
+- More Indian regional languages
+
+13. COMPLETE ARCHITECTURE SUMMARY
+
+Farmer
+  |
+  v
+AgriSmart Mobile-Friendly Frontend
+  |
+  v
+FastAPI Backend
+  |
+  +--------------------+----------------------+
+  |                    |                      |
+  v                    v                      v
+Satellite Module    Weather Module       Image Diagnosis
+  |                    |                      |
+  v                    v                      v
+NDVI / NDWI         Weather Risk         AI Vision Model
+  |                    |                      |
+  +--------------------+----------------------+
+                       |
+                       v
+                AI Decision Engine
+                       |
+                       v
+                 Risk / Health Score
+                       |
+          +------------+------------+
+          |            |            |
+       Healthy      Attention     Critical
+          |            |            |
+          +------------+------------+
+                       |
+                       v
+              AI Explanation Layer
+                       |
+                       v
+            Farmer-Friendly Alert
+                       |
+                       v
+              Recommended Action
+
+14. FINAL AI APPROACH
+
+AgriSmart should use a HYBRID AI APPROACH.
+
+Satellite analysis provides field-level crop monitoring.
+Computer vision provides crop-image diagnosis.
+Weather and market APIs provide external information.
+Machine-learning models identify patterns and risks.
+A decision engine combines these results.
+An AI language layer explains the results in simple English, Marathi, or Hindi.
+
+This approach is practical for a hackathon because it allows the team to demonstrate the complete workflow even when live satellite or agricultural datasets are limited.
+
+AgriSmart — Monitor smarter, act earlier, grow better.

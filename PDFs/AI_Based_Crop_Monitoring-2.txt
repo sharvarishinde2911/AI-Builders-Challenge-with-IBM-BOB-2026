@@ -1,0 +1,3 @@
+AI-Based Crop Monitoring Using Satellite Data
+
+Use satellite images to check the health of crops, detect drought stress, and identify damage to agricultural fields.
